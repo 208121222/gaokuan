@@ -1,0 +1,9 @@
+#include<stdio.h>
+2  int main(void)
+3  {
+4   int    num= 123 ; 
+5   float  x=34.678 ;
+6   char   ch=’+’;
+7   printf("%d %f %c\n", num, x,ch); //将三个变量的值从对应内存单元中取出来输出
+8   return  0;
+9 }
