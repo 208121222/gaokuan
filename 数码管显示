@@ -1,0 +1,32 @@
+#include <reg51.h>
+#include <stdio.h>
+#include <intrins.h>
+
+unsigned char DisplayBuf[8];
+unsigned char code CharCode[]={0xc0,0xF9,0xA4,0xB0,0x99,0x92,0x82,0xF8,0x80,0x90,0x88,0x83,0xC6,0xA1,0x86,0x8E};
+
+void Delay(void)
+{
+	int k=100;
+	while(k--);
+}
+
+void main(void)
+{
+	unsigned char l,pos;
+	P0=0;
+	P2=0xff;
+	for(l=0;l<7;l++) DisplayBuf[l]=l;
+
+	while(1)
+	{
+		pos=0x80;
+		for(l=0;l<8;l++)
+		{
+			P2=CharCode[DisplayBuf[l]];
+			P0=pos;
+			pos>>=1;
+			Delay();
+		}
+	}
+}
