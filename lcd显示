@@ -1,0 +1,61 @@
+#include <reg51.h>
+#include <stdio.h>
+#include <intrins.h>
+#include "LCM16X2P.H"
+#define OSC 11059200
+
+sbit CLK=P1^0;
+sbit DATA=P1^1;
+sbit CS=P1^2;
+sbit LCM_BLC=P1^3;
+
+unsigned int ADConvert(void)
+{
+	int i;
+	unsigned int ad;
+	ad=0;
+	DATA=1;
+	CS=0;
+	for(i=0;i<10;i++)
+	{
+		ad<<=1;
+	    CLK=0;
+	    _nop_();
+	    _nop_();
+	    _nop_();
+	    CLK=1;
+	    if(DATA) ad|=0x01;
+	    else ad&=0xFFFE;
+	 }
+	 CS=1;
+	 return ad;
+}
+
+void main()
+{
+	unsigned int ad;
+ 	float adf;
+ 	unsigned int he;
+ 	unsigned char a,b,c;
+
+	LCMInit();
+	LCMClear();
+
+	while(1)
+	{
+		ad=ADConvert();
+ 		ad=ADConvert();
+ 		adf=(ad*5.0)/1024.0;
+
+ 		he=100*adf;
+ 		a=he%10+0x30;
+ 		b=(he/10)%10+0x30;
+ 		c=he/100+0x30;
+			
+		LCMDisplayChar(0,6,c);
+		LCMDisplayChar(0,7,'.');
+		LCMDisplayChar(0,8,b);
+		LCMDisplayChar(0,9,a);
+		LCMDisplayChar(0,10,'V');
+	}
+}
