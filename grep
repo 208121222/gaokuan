@@ -1,0 +1,7 @@
+#grep pipe ch15.doc ch15-01.doc
+ch15.doc:I'v broken the command into two liners,with the pipe character as the 
+ch15.doc:the right thing and use the text line as the command to pipe to Is' s
+ch15.doc:The first few lines look like(ten actually,I piped the output to
+ch15-01.doc:I'v broken the command into two liners,with the pipe character as the
+ch15-01.doc:the right thing and use the text line as the command to pipe to Is' s
+ch15-01.doc:The first few lines look like(ten actually,I piped the output to
