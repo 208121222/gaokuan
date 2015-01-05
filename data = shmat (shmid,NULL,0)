@@ -1,0 +1,10 @@
+data = shmat (shmid,NULL,0);
+if(data==1)
+{
+  perror("shmat fail.");
+}
+...
+---
+printf("The strings in shm:%\n",data);
+gets(data);
+ipcrm -remove a message queue,semaphore set or shared memory id
