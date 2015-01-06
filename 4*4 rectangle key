@@ -1,0 +1,138 @@
+#include <reg52.h>
+#define uch unsigned char			    
+sbit d1=P1^0;
+sbit key1=P3^4;
+sbit dula=P2^6;
+sbit wela=P2^7;
+void delay(int z);
+uch jianpan();
+uch num=17,num1,temp;
+uch code table[]={	
+0x3f,0x06,0x5b,0x4f,0x66,0x6d,0x7d,0x07,0x7f,0x6f,  //定义数码管中显示字符，0~9
+0x77,0x7c,0x39,0x5e,0x79,0x71,0};   //定义数码管中显示字符，a~F
+void main()
+{
+	dula=1;
+	P0=0;	//关闭数码管
+	dula=0;
+	wela=1;
+	P0=0xc0;  //打开所有数码管
+	wela=0;
+	while(1)
+	{
+		num1=jianpan();    //大循环内部也可用嵌套调用函数替换display(jianpan());
+		dula=1;
+		P0=table[num1-1];  //定义显示函数void display(uch aa) { dula=1; P0=[aa-1]; dula=0;}
+		dula=0;	                     	
+}	                                  
+}
+void delay(int z)   //延时子函数
+{
+	int a,b;
+	for(a=0;a<1000;a++)
+	for(b=z;b>0;b--);
+}
+uch jianpan()
+{
+		P3=0xfe;   //P3赋初值
+		temp=P3;   //读回P3口的值
+		temp=temp&0xf0;  
+		while(temp!=0xf0)//结合上句判断第一行是否有键按下
+		{
+			delay(5);
+			temp=P3;
+			temp=temp&0xf0;
+			while(temp!=0xf0)//延时后再确认是否有键按下
+			{
+				temp=P3;
+				switch(temp)
+				{
+					case 0xee:num=1;break;
+					case 0xde:num=2;break;
+					case 0xbe:num=3;break;
+					case 0x7e:num=4;break;
+				}
+				while(temp!=0xf0)  //松手检测
+				{
+					temp=P3;
+					temp=temp&0xf0;	  
+				}
+			}
+		}
+		P3=0xfd;   //P3赋初值
+		temp=P3;   //读回P3口的值
+		temp=temp&0xf0;  
+		while(temp!=0xf0)//结合上句判断是否有键按下
+		{
+			delay(5);
+			temp=P3;
+			temp=temp&0xf0;
+			while(temp!=0xf0)//延时后再确认是否有键按下
+			{
+				temp=P3;
+				switch(temp)
+				{
+					case 0xed:num=5;break;
+					case 0xdd:num=6;break;
+					case 0xbd:num=7;break;
+					case 0x7d:num=8;break;
+				}
+				while(temp!=0xf0)  //松手检测
+				{
+					temp=P3;
+					temp=temp&0xf0;	  
+				}
+			}
+		}
+		P3=0xfb;   //P3赋初值
+		temp=P3;   //读回P3口的值
+		temp=temp&0xf0;  
+		while(temp!=0xf0)  //结合上句判断是否有键按下
+		{
+			delay(5);
+			temp=P3;
+			temp=temp&0xf0;
+			while(temp!=0xf0)  //延时后再确认是否有键按下
+			{
+				temp=P3;
+				switch(temp)
+				{
+					case 0xeb:num=9;break;
+					case 0xdb:num=10;break;
+					case 0xbb:num=11;break;
+					case 0x7b:num=12;break;
+				}
+				while(temp!=0xf0)  //松手检测
+				{
+					temp=P3;
+					temp=temp&0xf0;	  
+				}
+			}
+		}	
+		P3=0xf7;   //P3赋初值
+		temp=P3;   //读回P3口的值
+		temp=temp&0xf0;  
+		while(temp!=0xf0)/  /结合上句判断是否有键按下
+		{
+			delay(5);
+			temp=P3;
+			temp=temp&0xf0;
+			while(temp!=0xf0)  //延时后再确认是否有键按下
+			{
+				temp=P3;
+				switch(temp)
+				{
+					case 0xe7:num=13;break;
+					case 0xd7:num=14;break;
+					case 0xb7:num=15;break;
+					case 0x77:num=16;break;
+				}
+                 while(temp!=0xf0)  //松手检测
+				{
+					temp=P3;
+					temp=temp&0xf0;	  
+				}
+			}
+		}
+return num;	//返回值		
+}
