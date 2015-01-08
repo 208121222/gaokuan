@@ -1,0 +1,128 @@
+#include <reg51.h>
+#include <absacc.h>
+#include <intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+
+sbit RS=P1^7;
+sbit RW=P1^6;
+sbit E=P1^5;
+sbit ST=P3^7;
+sbit OE=P3^6;
+sbit EOC=P1^3;
+sbit CLK=P1^4;
+sbit key1=P1^0;
+
+uchar data chnumber;
+uchar disbuffer[4]={0,'.',0,0};
+uchar data ad_data[8]={0,0,0,0,0,0,0,0};
+uint temp;
+
+void fbusy()
+{
+ 	  P2=0xff;
+	  RS=0;
+	  RW=1;
+	  E=0;E=1;
+	  while(P2&0x80)
+	  {
+	  	E=0;
+		E=1;
+	  }
+ }
+
+   void wc51r(uchar j)
+ {
+	fbusy();
+	E=0;RS=0;RW=0;
+	E=1;
+	P2=j;
+	E=0; 	
+ }
+
+ void wc51ddr(uchar j)
+ {
+ 	fbusy();
+	E=0;RS=1;RW=0;
+	E=1;P2=j;
+	E=0;
+ }
+
+  void init()
+ {
+ 	wc51r(0x01);
+	wc51r(0x38);
+	wc51r(0x0c);
+	wc51r(0x06);
+ }
+
+ test()
+ {
+ 	uchar m;
+	for(m=0;m<8;m++)
+	{
+		P3=m;
+		ST=0;_nop_();_nop_();
+		ST=1;_nop_();_nop_();
+		ST=0;_nop_();_nop_();_nop_();_nop_();
+		while(EOC==0);
+		OE=1;ad_data[m]=P2;OE=0;
+	}
+ }
+
+ void delay(uint i)
+ {
+ 	uint y,j;
+	for(j=0;j<i;j++)
+	{
+		for(y=0;y<0xff;y++){;}
+	}						 
+ }
+
+ void T0X(void) interrupt 1 using 0
+ {
+ 	CLK=~CLK;
+ }
+
+ void main()
+ {
+ 	uchar i;
+	SP=0x50;TMOD=0x02;TH0=246;TL0=246;
+	ET0=1;EA=1;TR0=1;
+
+	delay(10);
+	init();
+
+	wc51r(0x81);
+	wc51ddr('A');
+	wc51ddr('D');
+	wc51ddr('D');
+	wc51ddr('R');
+	wc51ddr(':');
+	wc51r(0xc0);
+	wc51ddr('V');
+	wc51ddr('A');
+	wc51ddr('L');
+	wc51ddr('U');
+	wc51ddr('E');
+	wc51ddr(':');
+	while(1)
+	{
+		test();
+		if(key1==0)
+		{
+			while(key1==0);
+			chnumber++;
+			if(chnumber==8) chnumber=0;
+		}
+		temp=ad_data[chnumber];
+		temp=(temp*100)/51;
+		disbuffer[0]=temp/100+0x30;temp=temp%100;
+		disbuffer[2]=temp/10+0x30;
+		disbuffer[3]=temp%10+0x30;
+		wc51r(0x88);
+		wc51ddr(chnumber+0x30);
+		wc51r(0xc8);		 
+		for(i=0;i<4;i++) wc51ddr(disbuffer[i]);
+	}
+ }
