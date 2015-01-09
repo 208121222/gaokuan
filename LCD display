@@ -1,0 +1,164 @@
+#include<reg51.h>
+#include<intrins.h>
+#define uchar unsigned char
+#define uint unsigned int
+
+sbit a1=P1^0;
+sbit a2=P1^1;
+sbit a3=P1^2;
+sbit a4=P1^3;
+sbit a5=P1^4;
+sbit scl=P1^5;
+sbit sda=P1^6;
+sbit lcdrs=P3^4;
+sbit lcdrw=P3^6;
+sbit lcden=P3^7;
+
+uchar code table[]={0xeb,0x88,0xb3,0xba,0xd8,0x7a,0x7b,0xa8,0xfb,0xfa};
+uint k,k1;
+
+void delayms(uchar ms)
+  {
+     uchar i;
+	 while(ms--)
+	 {
+	 	for(i=0;i<120;i++);
+	 }
+  }
+
+void delay()
+  {
+      uint j;
+	  for(j=0;j<600;j++);
+  }
+
+void start()
+  {
+	    sda=1;
+		scl=1;
+		_nop_();
+		_nop_();
+		sda=0;
+		_nop_();
+		_nop_();
+		_nop_();
+		_nop_();
+	    scl=0;
+  }
+
+void stop()
+  {   
+        sda=0;
+		_nop_();
+		_nop_();
+		scl=1;
+		_nop_();
+		_nop_();
+		_nop_();
+		_nop_();
+		sda=1; 
+  }
+
+uchar duqu()
+{
+     uchar l,du_data;
+	 for(l=0;l<8;l++)
+	 {
+	   scl=1;
+	   du_data<<=1;
+	   du_data|=(uchar)sda;
+	   scl=0;
+	 }
+	 return(du_data);
+}
+
+bit xieshu(uchar xie_data)
+{
+      uchar m;
+	  bit ack;
+	  for(m=0;m<8;m++)	
+	  {
+	    sda=(bit)(xie_data&0x80);
+		_nop_();
+		scl=1;
+		_nop_();
+		_nop_();
+		scl=0;
+		xie_data<<=1;
+	  }
+	    sda=1;
+		_nop_();
+		_nop_();
+		scl=1;
+		_nop_();
+		_nop_();
+		_nop_();
+		_nop_();
+		ack=sda;
+		scl=0;
+		return ack;
+  }
+
+  void write_byte(uchar adder,uchar xie_data)
+  {
+         start();
+		 xieshu(0xa0);
+		 xieshu(adder);
+		 xieshu(xie_data);
+		 stop();
+		 delayms(10);
+  }
+
+ uchar read_dangqian()
+ {
+      uchar read_data;
+	  start();
+	  xieshu(0xa1);
+	  read_data=duqu();
+	  stop();
+	  return read_data;
+ } 
+
+ uchar read_zhiding(uchar zhi_adder)
+ {
+      start();
+	  xieshu(0xa0);
+	  xieshu(zhi_adder);
+	  return (read_dangqian());
+ }
+
+void display()
+{	  	
+         
+		 a3=1;
+		 a2=a1=a4=0;
+		 P0=table[k1/10];
+		 delay();
+		 P0=0X00;
+		 a4=1;
+		 a1=a2=a3=0;
+		 P0=table[k1%10];
+		 delay();
+		 P0=0X00;
+}
+
+void main()
+{
+        a5=0;  
+        sda=1;
+		scl=1;
+		k=0;
+		write_byte(0x01,0x02);
+		delayms(250);
+		delayms(250);
+		write_byte(0x02,0x01);
+		delayms(250);
+		delayms(250);
+		k=read_zhiding(0x01);
+		k1=read_zhiding(0x02);
+		delayms(250);
+		while(1)
+		{
+			display();
+		}
+}
