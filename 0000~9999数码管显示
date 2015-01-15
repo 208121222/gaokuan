@@ -1,0 +1,36 @@
+#include<reg52.h>
+unsigned  char led[]={0xeb,0x88,0xb3,0xba,0xd8,0x7a,0x7b,0xa8,0xfb,0xfa};
+void delay(unsigned int i)
+{
+	for(;i>0;i--);
+}
+
+	void main()
+   { 
+   		unsigned  int a=0;
+		unsigned int m;
+ 		while(1)
+		 {  
+		 	for(m=500;m>0;m--)
+			{
+			P1=0x01;
+    	 	P0=led[a/1000];
+     		delay(1000);
+			P0=0x00;
+			P1=0x02;
+	   		P0=led[(a/100)%10];
+	 		delay(1000);
+			P0=0x00;
+   			P1=0x04;
+     		P0=led[(a%100)/10];
+	 		delay(500); 
+			P0=0x00;   
+   			P1=0x08;
+     		P0=led[a%10];	
+     		delay(100);
+			P0=0x00;
+			}
+		    a++;
+			if(a==10000) a=0;
+     	} 
+	}
